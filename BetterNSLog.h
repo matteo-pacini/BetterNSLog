@@ -33,7 +33,7 @@
 	// Utilities //
 	///////////////
 	
-	#define THIS_APP [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] uppercaseString]
+	#define THIS_APP [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]
 
 	#define THIS_FILE [(@"" __FILE__) lastPathComponent]
 
