@@ -27,53 +27,55 @@
 #ifndef BETTER_NSLOG_H
 #define BETTER_NSLOG_H
 
-	#import <Foundation/Foundation.h>
+  #import <Foundation/Foundation.h>
 
-	///////////////
-	// Utilities //
-	///////////////
-	
-	#define THIS_APP [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]
+  #import <asl.h>
 
-	#define THIS_FILE [(@"" __FILE__) lastPathComponent]
+  ///////////////
+  // Utilities //
+  ///////////////
+  
+  #define THIS_APP [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]
 
-	////////////
-	// _NSLOG //
-	////////////
+  #define THIS_FILE [(@"" __FILE__) lastPathComponent]
 
-	//Do-while?
-	//https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
-	
-	#define _NSLog(fmt,...) {													\
-		do 																		\
-		{																		\
-			NSString *str = [NSString stringWithFormat:fmt, ##__VA_ARGS__];		\
-			printf("%s\n",[str UTF8String]);									\
-		}																		\
-		while (0);																\
-	}
-		
-	/////////////////////
-	// NSLog Shadowing //
-	/////////////////////
-	
-	#define NSLog(fmt, ...) _NSLog((@"[%@] " fmt), THIS_APP, ##__VA_ARGS__)
+  ////////////
+  // _NSLOG //
+  ////////////
 
-	//////////
-	// DLog //
-	//////////
-	
-	#ifdef DEBUG
-    	#define DLog(fmt, ...) _NSLog((@"[%@][mt:%d][s:%@:%d][f:%s] " fmt), 		\
-										THIS_APP, 									\
-										[NSThread isMainThread]?1:0, 				\
-										THIS_FILE, 									\
-										__LINE__,									\
-										__FUNCTION__,								\
-	 									##__VA_ARGS__)				
-	#else
-		#define DLog(...)
-	#endif
-																				 
-						
+  //Do-while?
+  //https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+  #define _NSLog(fmt,...) {                                             \
+    do                                                                  \
+    {                                                                   \
+      NSString *str = [NSString stringWithFormat:fmt, ##__VA_ARGS__];   \
+      printf("%s\n",[str UTF8String]);                                  \
+      asl_log(NULL, NULL, ASL_LEVEL_NOTICE, "%s", [str UTF8String]);    \
+    }                                                                   \
+    while (0);                                                          \
+  }
+    
+  /////////////////////
+  // NSLog Shadowing //
+  /////////////////////
+  
+  #define NSLog(fmt, ...) _NSLog((@"[%@] " fmt), THIS_APP, ##__VA_ARGS__)
+
+  //////////
+  // DLog //
+  //////////
+  
+  #ifdef DEBUG
+      #define DLog(fmt, ...) _NSLog((@"[%@][%@:%d][%s] " fmt),    \
+                    THIS_APP,                                     \
+                    THIS_FILE,                                    \
+                    __LINE__,                                     \
+                    __FUNCTION__,                                 \
+                    ##__VA_ARGS__)        
+  #else
+    #define DLog(...)
+  #endif
+                                         
+            
 #endif
